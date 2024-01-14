@@ -1,18 +1,13 @@
-use rocket::request::{FromRequest, Outcome, Request};
-use rocket::http::Status;
+use api_shit::data::{ApiResponse, ApiResponseWrapper};
 use rocket::get;
+use rocket::http::Status;
+use rocket::request::Request;
 use rocket::serde::Serialize;
 use thiserror::Error;
-use api_shit::data::{ApiResponseWrapper, ApiResponse};
 
+use api_shit::{ApiHandler, AppError};
 use rocket::response::{self, Responder, Response};
 use rocket::serde::json::Json;
-use api_shit::{ApiHandler, AppError};
-
-
-pub struct ItemId {
-    pub value: String,
-}
 
 #[derive(Serialize)]
 pub struct EndDate {
@@ -36,9 +31,10 @@ pub async fn get_end_date(item_id: &str) -> Result<Json<EndDate>, ApiError> {
     match api_handler.get_data().await {
         Ok(end_date) => {
             println!("{}", end_date);
-            let deserialized: ApiResponseWrapper = serde_json::from_value((&end_date).parse().unwrap())
-                .map_err(AppError::Deserialization)
-                .expect("paul");
+            let deserialized: ApiResponseWrapper =
+                serde_json::from_value((end_date).parse().unwrap())
+                    .map_err(AppError::Deserialization)
+                    .expect("paul");
             let view_item_lite_response: &ApiResponse = &deserialized.view_item_lite_response;
             let end_date = &view_item_lite_response.item[0].end_date;
             let formatted_end_date = format!("{} {}", end_date.date, end_date.time);

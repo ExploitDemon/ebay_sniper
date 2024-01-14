@@ -4,7 +4,6 @@ use reqwest::Response;
 use serde_json::Value;
 // use std::time::{SystemTime, UNIX_EPOCH};
 
-
 pub struct ResponseProcessor;
 
 impl ResponseProcessor {
@@ -49,10 +48,9 @@ impl ResponseProcessor {
                 // println!("{:?}", view_item_lite_response.item[0].is_auto_refresh_enabled);
                 let view_item_lite_response: &ApiResponse = &deserialized.view_item_lite_response;
                 let end_date = &view_item_lite_response.item[0].end_date;
-                let formatted_end_date = format!("{} {}", end_date.date, end_date.time);
+                let _formatted_end_date = format!("{} {}", end_date.date, end_date.time);
 
                 // println!("Current timestamp: {:?}", timestamp);
-
 
                 // println!("{:?}", deserialized.view_item_lite_response.item[0].is_ended);
 
@@ -68,6 +66,4 @@ impl ResponseProcessor {
         let end_date = ResponseProcessor::process_response(response).await?;
         Ok(end_date)
     }
-
-
 }
