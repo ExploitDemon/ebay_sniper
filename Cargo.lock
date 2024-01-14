@@ -32,6 +32,7 @@ version = "0.1.0"
 dependencies = [
  "dotenv",
  "reqwest",
+ "rocket",
  "serde",
  "serde_json",
  "thiserror",

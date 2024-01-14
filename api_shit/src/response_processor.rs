@@ -8,7 +8,7 @@ use serde_json::Value;
 pub struct ResponseProcessor;
 
 impl ResponseProcessor {
-    pub async fn process_response(response: String) -> Result<String, AppError> {
+    pub async fn process_response(response: Response) -> Result<String, AppError> {
         match response.text().await {
             Ok(response_text) => {
                 // Extract JSON from JSONP
@@ -39,7 +39,7 @@ impl ResponseProcessor {
                     .map_err(AppError::Deserialization)
                     .expect("paul");
 
-                let view_item_lite_response: &ApiResponse = &deserialized.view_item_lite_response;
+                // let view_item_lite_response: &ApiResponse = &deserialized.view_item_lite_response;
                 // If no error, return the data as a string
                 // let timestamp = SystemTime::now()
                 //     .duration_since(UNIX_EPOCH)
@@ -47,8 +47,9 @@ impl ResponseProcessor {
                 //     .as_secs();
 
                 // println!("{:?}", view_item_lite_response.item[0].is_auto_refresh_enabled);
+                let view_item_lite_response: &ApiResponse = &deserialized.view_item_lite_response;
                 let end_date = &view_item_lite_response.item[0].end_date;
-                println!("{} {}", end_date.date, end_date.time);
+                let formatted_end_date = format!("{} {}", end_date.date, end_date.time);
 
                 // println!("Current timestamp: {:?}", timestamp);
 
@@ -63,4 +64,10 @@ impl ResponseProcessor {
             }
         }
     }
+    pub async fn get_end_date_string(response: Response) -> Result<String, AppError> {
+        let end_date = ResponseProcessor::process_response(response).await?;
+        Ok(end_date)
+    }
+
+
 }

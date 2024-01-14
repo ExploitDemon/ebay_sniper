@@ -1,6 +1,6 @@
 mod api_handler;
 mod config;
-mod data;
+pub mod data;
 mod errors;
 mod http_client;
 mod response_processor;
