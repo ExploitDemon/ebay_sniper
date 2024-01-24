@@ -14,6 +14,8 @@ pub enum AppError {
     Unknown,
     #[error("Field not found: {0}")]
     MissingField(String),
+    #[error("Missing field `TimeLeft` in the response")]
+    MissingTimeLeftField,
 }
 
 #[derive(Debug, Error)]

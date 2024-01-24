@@ -7,6 +7,6 @@ mod response_processor;
 
 pub use api_handler::ApiHandler;
 pub use config::Config;
-pub use data::ApiResponseWrapper;
+pub use data::{ApiResponse, ApiResponseWrapper};
 pub use errors::AppError;
 pub use response_processor::ResponseProcessor; // Re-export any other public items

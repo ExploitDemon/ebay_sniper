@@ -15,7 +15,7 @@ pub struct EndDate {
 
 #[get("/get_end_date/<item_id>")]
 pub async fn get_end_date(item_id: &str, key: ApiKey) -> Result<Json<EndDate>, ApiError> {
-    dotenv().ok();z
+    dotenv().ok();
     let match_key = env::var("API_KEY").unwrap_or_default();
     if key.0 != match_key {
         return Err(ApiError::InvalidApiKey);

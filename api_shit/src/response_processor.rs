@@ -34,9 +34,15 @@ impl ResponseProcessor {
                 }
 
                 // Deserialize the JSON value into ApiResponseWrapper
-                let deserialized: ApiResponseWrapper = serde_json::from_value(value)
-                    .map_err(AppError::Deserialization)
-                    .expect("paul");
+                let deserialized: ApiResponseWrapper =
+                    serde_json::from_value(value).map_err(|e| {
+                        if e.to_string().contains("missing field `TimeLeft`") {
+                            println!("{}", AppError::MissingTimeLeftField);
+                            AppError::MissingTimeLeftField
+                        } else {
+                            AppError::Deserialization(e)
+                        }
+                    })?;
 
                 // let view_item_lite_response: &ApiResponse = &deserialized.view_item_lite_response;
                 // If no error, return the data as a string
