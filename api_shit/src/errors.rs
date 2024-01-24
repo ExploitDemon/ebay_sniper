@@ -14,6 +14,8 @@ pub enum AppError {
     Unknown,
     #[error("Field not found: {0}")]
     MissingField(String),
+    #[error("Missing field `TimeLeft` in the response")]
+    MissingTimeLeftField,
 }
 
 #[derive(Debug, Error)]
@@ -22,5 +24,7 @@ pub enum ApiError {
     ItemNotFound(u64),
     #[error("Failed to get item ID from request parameters")]
     ItemIdError,
+    #[error("Invalid API key")]
+    InvalidApiKey,
     // Add other API error types here as needed
 }

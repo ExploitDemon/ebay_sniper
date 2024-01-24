@@ -1,47 +1,38 @@
-use rocket::request::{FromRequest, Outcome, Request};
-use rocket::http::Status;
+use crate::api::api_key::ApiKey;
+use crate::api::errors::ApiError;
+use api_shit::data::{ApiResponse, ApiResponseWrapper};
+use api_shit::ApiHandler;
+use dotenv::dotenv;
 use rocket::get;
 use rocket::serde::json::Json;
 use rocket::serde::Serialize;
-use thiserror::Error;
-use api_shit::{ApiHandler, ApiResponseWrapper, ResponseProcessor};
-use rocket::response::{self, Responder, Response};
-
-
-
-pub struct ItemId {
-    pub value: String,
-}
+use std::env;
 
 #[derive(Serialize)]
 pub struct EndDate {
-    end_date: String,
-}
-
-impl<'r> Responder<'r, 'static> for ApiError {
-    fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
-        Response::build().status(Status::InternalServerError).ok()
-    }
-}
-#[derive(Error, Debug)]
-pub enum ApiError {
-    #[error("Failed to get item ID from request parameters")]
-    ItemIdError,
-    // Add other error types here as needed
+    formatted_end_date: String,
 }
 
 #[get("/get_end_date/<item_id>")]
-pub async fn get_end_date(item_id: &str) -> Result<Json<EndDate>, ApiError> {
+pub async fn get_end_date(item_id: &str, key: ApiKey) -> Result<Json<EndDate>, ApiError> {
+    dotenv().ok();
+    let match_key = env::var("API_KEY").unwrap_or_default();
+    if key.0 != match_key {
+        return Err(ApiError::InvalidApiKey);
+    }
+
     let api_handler = ApiHandler::new(item_id.to_string());
+
     match api_handler.get_data().await {
-        Ok(response) => {
-            // Process the response to extract the end date
-            let processed_response = ResponseProcessor::process_response(response).await?;
-            let deserialized: ApiResponseWrapper = serde_json::from_str(&processed_response)?;
-            let api_end_date= &deserialized.view_item_lite_response.item[0].end_date;
-            let end_date = format!("{} {}", api_end_date.date, api_end_date.time);
-            Ok(Json(EndDate { end_date }))
-        },
+        Ok(end_date) => {
+            let deserialized: ApiResponseWrapper =
+                serde_json::from_value((end_date).parse().unwrap())
+                    .map_err(|_| ApiError::DeserializationError)?;
+            let view_item_lite_response: &ApiResponse = &deserialized.view_item_lite_response;
+            let end_date = &view_item_lite_response.item[0].end_date;
+            let formatted_end_date = format!("{} {}", end_date.date, end_date.time);
+            Ok(Json(EndDate { formatted_end_date }))
+        }
         Err(_) => Err(ApiError::ItemIdError),
     }
 }

@@ -1,9 +1,7 @@
-use std::time::Duration;
-use reqwest::header::{ACCEPT, ACCEPT_ENCODING, REFERER, USER_AGENT};
-use reqwest::Client;
-use std::env;
 use crate::AppError;
-
+use reqwest::header::{ACCEPT, ACCEPT_ENCODING, USER_AGENT};
+use reqwest::Client;
+use std::time::Duration;
 pub struct HttpClient {
     client: Client,
 }
